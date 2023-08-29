@@ -14,7 +14,7 @@ CHAT_IDs = ['684630739','229091667']
 
 
 
-x = requests.get('https://ws.alibaba.ir/api/v2/bus/available?orginCityCode=21310000&destinationCityCode=11320000&requestDate=2023-08-25&passengerCount=1')
+x = requests.get('https://ws.alibaba.ir/api/v2/bus/available?orginCityCode=21310000&destinationCityCode=11320000&requestDate=2023-09-01&passengerCount=1')
 data=x.json()['result']
 availableList=data['availableList']
 # print(availableList)
