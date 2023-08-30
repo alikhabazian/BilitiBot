@@ -48,7 +48,8 @@ class Task:
                 message += '\n'+self.__str__()
                 params = {
                         'chat_id': CHAT_ID,
-                        'text': message
+                        'text': message,
+                        'disable_notification': True
                 }
                 response = requests.post(api_url, json=params)
                 if response.status_code == 200:
@@ -75,8 +76,7 @@ class Task:
                     is_any=True
                     self.send_message(available)
         if not is_any:
-            pass
-            #self.send_message(None)
+            self.send_message(None)
 
     def __str__(self):
         return '\n'.join([
