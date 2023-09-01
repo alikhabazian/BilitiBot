@@ -20,6 +20,20 @@ class Task:
         self.orgin_city=orgin_city
         self.destination_city=destination_city
 
+    @staticmethod
+    def get_task_fields():
+        # This method returns a list of field names expected for a task.
+        return [
+            "creator",
+            "receivers",
+            "how_often",
+            "orgin_city",
+            "destination_city",
+            "date",
+            "start_time",
+            "end_time"
+        ]
+
     def get_CityCode_ali_baba(self,city):
         url = "https://ws.alibaba.ir/api/v1/bus/stations"
         querystring = {"filter":"containsall={ct:"+f"'{city}'"+"}"}
