@@ -106,7 +106,8 @@ class Task:
                     is_any=True
                     self.send_message(available,'alibaba')
         if not is_any:
-            self.send_message(None,'alibaba')
+            pass
+            #self.send_message(None,'alibaba')
     
     def get_data_snapp(self):
         request = requests.get(self.get_url_snapp())
@@ -126,7 +127,8 @@ class Task:
                     is_any=True
                     self.send_message(available,'snapp')
         if not is_any:
-            self.send_message(None,'snapp')
+            pass
+            #self.send_message(None,'snapp')
 
     
 
