@@ -8,7 +8,7 @@ load_dotenv()
 BOT_TOKEN=bot_token = os.getenv("BOT_TOKEN")
 # 21310000 isf 11320000 teh
 class Task:
-    def __init__(self, creator, receivers, how_often,orgin_city,destination_city,date,start_time,end_time):
+    def __init__(self, creator, receivers, how_often,orgin_city,destination_city,date,start_time,end_time,mute=False):
         self.creator = creator
         self.receivers = receivers
         self.how_often = how_often
@@ -19,6 +19,7 @@ class Task:
         self.end_time = end_time
         self.orgin_city=orgin_city
         self.destination_city=destination_city
+        self.mute=mute
 
     @staticmethod
     def get_task_fields():
@@ -119,9 +120,8 @@ class Task:
                 if available['availableSeats']>0:
                     is_any=True
                     self.send_message(available,'alibaba')
-        if not is_any:
-            pass
-            #self.send_message(None,'alibaba')
+        if not is_any and not self.mute:
+            self.send_message(None,'alibaba')
     
     def get_data_snapp(self):
         request = requests.get(self.get_url_snapp())
@@ -140,9 +140,8 @@ class Task:
                 if available['capacity']>0:
                     is_any=True
                     self.send_message(available,'snapp')
-        if not is_any:
-            pass
-            #self.send_message(None,'snapp')
+        if not is_any and not self.mute:
+            self.send_message(None,'snapp')
 
     
 
