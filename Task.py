@@ -8,7 +8,7 @@ load_dotenv()
 BOT_TOKEN=bot_token = os.getenv("BOT_TOKEN")
 # 21310000 isf 11320000 teh
 class Task:
-    def __init__(self, creator, receivers, how_often,orgin_city,destination_city,date,start_time,end_time,mute=False):
+    def __init__(self, creator, receivers, how_often,orgin_city,destination_city,date,start_time,end_time,mute=True):
         self.creator = creator
         self.receivers = receivers
         self.how_often = how_often
