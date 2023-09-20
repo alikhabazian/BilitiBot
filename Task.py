@@ -143,6 +143,90 @@ class Task:
         if not is_any and not self.mute:
             self.send_message(None,'snapp')
 
+
+
+    def login_alibaba(self,username,password):
+        url = "https://ws.alibaba.ir/api/v3/account/token"
+        payload = {
+            "emailOrPhone": f"{username}",
+            "password": f"{password}"
+        }
+        headers = {
+            "Content-Type": "application/json"
+        }
+        response = requests.request("POST", url, json=payload, headers=headers)
+        token = response.json()['result']['access_token']
+        return token
+
+    def get_last_ticket_alibaba(self,providerItemIds):
+        url = f'https://ws.alibaba.ir/api/v1/bus/available/{providerItemIds}/seats'
+        response = requests.request("GET", url)
+        for item in response.json()['result']:
+            if item['status'] == 'Available':
+                print(item['index'], item['status'])
+                break
+        return item['index']
+
+    def poass_passenger_ddetail_alibaba(self,providerItemIds,token,firstName,lastName,title,seat,nationalCode):
+        url = "https://ws.alibaba.ir/api/v1/coordinator/basket/items/bus"
+        payload = {"providerItemIds": [f"{providerItemIds}"],
+                   "firstName": firstName,
+                   "lastName": lastName,
+                   "firstNameEnglish": None,
+                   "lastNameEnglish": None,
+                   "title": title,
+                   "seats": [seat],
+                   "nationalCodes": [nationalCode]
+                   }
+        headers = {
+            "Authorization": f"Bearer {token}"
+        }
+        response = requests.request("PUT", url, json=payload, headers=headers)
+        basketId = response.json()['result']['basketId']
+        return basketId
+
+    def checkout_alibaba(self,token,basketId,notificationCellphoneNumber):
+        url = f"https://ws.alibaba.ir/api/v2/coordinator/basket/{basketId}/checkout"
+        headers = {
+            "Authorization": f"Bearer {token}"
+        }
+        payload = {"notificationEmail": "", "notificationCellphoneNumber": notificationCellphoneNumber}
+        response = requests.request("POST", url, json=payload, headers=headers)
+        orderId = response.json()['result']['orderId']
+        return orderId
+
+
+    def confirm_alibaba(self,token,orderId):
+        url = f'https://ws.alibaba.ir/api/v1/coordinator/order/{orderId}/confirm'
+        headers = {
+            "Authorization": f"Bearer {token}"
+        }
+        response = requests.request("POST", url, headers=headers)
+        return response.json()["success"]
+
+    def status_alibaba(self,token,orderId):
+        url = f"https://ws.alibaba.ir/api/v2/coordinator/order/{orderId}/status"
+        headers = {
+            "Authorization": f"Bearer {token}"
+        }
+        response = requests.request("GET", url, headers=headers)
+        return response.json()["result"]['orderStatus']=="Confirmed"
+    def buy_ticket_alibaba(self,providerItemIds,username,password,firstName,lastName,title,seat,nationalCode,notificationCellphoneNumber):
+        token=self.login_alibaba(username,password)
+        index=self.get_last_ticket_alibaba(providerItemIds)
+        basketId= self.poass_passenger_ddetail_alibaba(providerItemIds,token,firstName,lastName,title,seat,nationalCode)
+        orderId=self.checkout_alibaba(token,basketId,notificationCellphoneNumber)
+        if self.confirm_alibaba(token,orderId):
+            if self.status_alibaba(token,orderId):
+                pass
+
+
+
+
+
+
+
+
     
 
     def __str__(self):
