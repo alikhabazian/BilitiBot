@@ -104,6 +104,7 @@ class Task:
     def get_data_ali_baba(self):
         # print(self.get_url_ali_baba())
         request = requests.get(self.get_url_ali_baba())
+        # print(self.get_url_ali_baba())
         data=request.json()['result']
         # print(data)
         availableList=data['availableList']
