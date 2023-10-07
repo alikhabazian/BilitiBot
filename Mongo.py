@@ -76,8 +76,14 @@ try:
 
     for task in tasks:
         # print(task)
-        task.get_data_ali_baba()
-        task.get_data_snapp()
+        try:
+            task.get_data_ali_baba()
+        except Exception as e:
+            print(e)
+        try:
+            task.get_data_snapp()
+        except Exception as e:
+            print(e)
 
 except Exception as e:
     print(e)
