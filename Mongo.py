@@ -69,7 +69,13 @@ try:
             destination_city=document['destination_city'],
             date=document['date'],
             start_time=document['start_time'],
-            end_time=document['end_time']
+            end_time=document['end_time'],
+            username=document['username'],
+            password=document['password'],
+            firstName=document['firstName'],
+            lastName=document['lastName'],
+            nationalCode=document['nationalCode'],
+            notificationCellphoneNumber=document['notificationCellphoneNumber'],
         )
         # print(task)
         tasks.append(task)

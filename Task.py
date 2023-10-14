@@ -8,7 +8,7 @@ load_dotenv()
 BOT_TOKEN=bot_token = os.getenv("BOT_TOKEN")
 # 21310000 isf 11320000 teh
 class Task:
-    def __init__(self, creator, receivers, how_often,orgin_city,destination_city,date,start_time,end_time,mute=True):
+    def __init__(self, creator, receivers, how_often,orgin_city,destination_city,date,start_time,end_time,username=None,password=None,firstName=None,lastName=None,title='MR',nationalCode=None,notificationCellphoneNumber=None,mute=True):
         self.creator = creator
         self.receivers = receivers
         self.how_often = how_often
@@ -19,7 +19,18 @@ class Task:
         self.end_time = end_time
         self.orgin_city=orgin_city
         self.destination_city=destination_city
+        # -------------------
         self.mute=mute
+        # -------------------
+        self.username=username
+        self.password=password
+        self.firstName=firstName
+        self.lastName=lastName
+        self.title=title
+        self.nationalCode=nationalCode
+        self.notificationCellphoneNumber=notificationCellphoneNumber
+
+
 
     @staticmethod
     def get_task_fields():
@@ -42,6 +53,14 @@ class Task:
         result=response.json()['result']['items']
         if len(result)>0:
             return result[0]['domainCode']
+
+    def get_CityName_ali_baba(self,city):
+        url = "https://ws.alibaba.ir/api/v1/bus/stations"
+        querystring = {"filter":"containsall={ct:"+f"'{city}'"+"}"}
+        response = requests.request("GET", url ,params=querystring)
+        result=response.json()['result']['items']
+        if len(result)>0:
+            return result[0]['displayNames'][1]['value']
 
     def get_CityCode_snapp(self,city):
         url = "https://www.snapptrip.com/bus/api/listing/v1/cities"
@@ -70,6 +89,14 @@ class Task:
                 deleted_value = {key: value for key, value in available.items() if key != 'proposalId'}
                 message = f"I found ticket for you in {company}\ncurrent time is "+str(datetime.now().time())+'\n'+str(deleted_value)
                 message += '\n'+self.__str__()
+                if company=='alibaba':
+                    # try:
+                        if self.username and self.password and self.firstName and self.lastName and self.title and self.nationalCode and self.notificationCellphoneNumber:
+
+                            message += '\nit is url that I booked for you just pay it :'+self.book_ticket_alibaba(providerItemIds=available['proposalId'],username=self.username,password=self.password,firstName=self.firstName,lastName=self.lastName,title=self.title,nationalCode=self.nationalCode,notificationCellphoneNumber=self.notificationCellphoneNumber)
+
+                    # except Exception as e:
+                    #     print(e)
                 params = {
                     'chat_id': CHAT_ID,
                     'text': message
@@ -147,6 +174,7 @@ class Task:
 
 
     def login_alibaba(self,username,password):
+        # print('login_alibaba')
         url = "https://ws.alibaba.ir/api/v3/account/token"
         payload = {
             "emailOrPhone": f"{username}",
@@ -160,15 +188,17 @@ class Task:
         return token
 
     def get_last_ticket_alibaba(self,providerItemIds):
+        # print('get_last_ticket_alibaba')
         url = f'https://ws.alibaba.ir/api/v1/bus/available/{providerItemIds}/seats'
         response = requests.request("GET", url)
         for item in response.json()['result']:
             if item['status'] == 'Available':
-                print(item['index'], item['status'])
+                # print(item['index'], item['status'])
                 break
-        return item['index']
+        return item['number']
 
     def poass_passenger_ddetail_alibaba(self,providerItemIds,token,firstName,lastName,title,seat,nationalCode):
+        # print('poass_passenger_ddetail_alibaba')
         url = "https://ws.alibaba.ir/api/v1/coordinator/basket/items/bus"
         payload = {"providerItemIds": [f"{providerItemIds}"],
                    "firstName": firstName,
@@ -187,6 +217,7 @@ class Task:
         return basketId
 
     def checkout_alibaba(self,token,basketId,notificationCellphoneNumber):
+        # print('checkout_alibaba')
         url = f"https://ws.alibaba.ir/api/v2/coordinator/basket/{basketId}/checkout"
         headers = {
             "Authorization": f"Bearer {token}"
@@ -198,28 +229,48 @@ class Task:
 
 
     def confirm_alibaba(self,token,orderId):
+        # print('confirm_alibaba')
         url = f'https://ws.alibaba.ir/api/v1/coordinator/order/{orderId}/confirm'
         headers = {
             "Authorization": f"Bearer {token}"
         }
         response = requests.request("POST", url, headers=headers)
+        print(response.text)
         return response.json()["success"]
 
     def status_alibaba(self,token,orderId):
+        # print('status_alibaba')
         url = f"https://ws.alibaba.ir/api/v2/coordinator/order/{orderId}/status"
         headers = {
             "Authorization": f"Bearer {token}"
         }
         response = requests.request("GET", url, headers=headers)
+        print(response.text)
         return response.json()["result"]['orderStatus']=="Confirmed"
-    def buy_ticket_alibaba(self,providerItemIds,username,password,firstName,lastName,title,seat,nationalCode,notificationCellphoneNumber):
+
+    def pay_alibaba(self,orderId,token):
+        # print('pay_alibaba')
+        url = f'https://ws.alibaba.ir/api/v3/coordinator/order/{orderId}/pay-request'
+        payload = {"redirectUrl": f"https://www.alibaba.ir/bus/{self.get_CityName_ali_baba(self.orgin_city)}-{self.get_CityName_ali_baba(self.destination_city)}/o6ti0e/{orderId}/issue",
+                   "payRequestType": "PayByBank"}
+        headers = {
+            "Authorization": f"Bearer {token}"
+        }
+        response = requests.request("POST", url, json=payload, headers=headers)
+        return response.json()['result']['bankUrl']
+    def book_ticket_alibaba(self,providerItemIds,username,password,firstName,lastName,title,nationalCode,notificationCellphoneNumber):
         token=self.login_alibaba(username,password)
-        index=self.get_last_ticket_alibaba(providerItemIds)
+        # print(token)
+        seat=self.get_last_ticket_alibaba(providerItemIds)
+        # print(seat)
         basketId= self.poass_passenger_ddetail_alibaba(providerItemIds,token,firstName,lastName,title,seat,nationalCode)
+        # print(basketId)
         orderId=self.checkout_alibaba(token,basketId,notificationCellphoneNumber)
+        # print(orderId)
         if self.confirm_alibaba(token,orderId):
+
             if self.status_alibaba(token,orderId):
-                pass
+                return self.pay_alibaba(orderId,token)
 
 
 
@@ -244,8 +295,7 @@ class Task:
         
 
 if __name__ == "__main__":
-    task=Task("684630739", ["684630739",'229091667'], "daily", "21310000",'اصفهان' ,"11320000", "2023-09-08", "18:00:00", "23:59:59")
-    a=task.get_CityCode_snapp('اصفهان')
-    print(a,type(a))
+    task=Task(creator = '684630739',receivers = ['684630739'],how_often = 'daily',orgin_city = 'تهران',destination_city = 'اصفهان',date = '2023-10-17',start_time = '00:00:00',end_time = '23:59:59')
+    task.get_data_ali_baba()
     
 
