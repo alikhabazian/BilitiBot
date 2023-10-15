@@ -2,13 +2,16 @@ from datetime import datetime, time
 import requests
 import os
 from dotenv import load_dotenv
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+
 
 load_dotenv()
 
 BOT_TOKEN=bot_token = os.getenv("BOT_TOKEN")
 # 21310000 isf 11320000 teh
 class Task:
-    def __init__(self, creator, receivers, how_often,orgin_city,destination_city,date,start_time,end_time,username=None,password=None,firstName=None,lastName=None,title='MR',nationalCode=None,notificationCellphoneNumber=None,mute=True):
+    def __init__(self, creator, receivers, how_often,orgin_city,destination_city,date,start_time,end_time,username=None,password=None,firstName=None,lastName=None,title='MR',nationalCode=None,notificationCellphoneNumber=None,alibabaToken=None,Task_id=None,mute=True):
         self.creator = creator
         self.receivers = receivers
         self.how_often = how_often
@@ -29,6 +32,8 @@ class Task:
         self.title=title
         self.nationalCode=nationalCode
         self.notificationCellphoneNumber=notificationCellphoneNumber
+        self.alibabaToken=alibabaToken
+        self.Task_id=Task_id
 
 
 
@@ -260,8 +265,25 @@ class Task:
         response = requests.request("POST", url, json=payload, headers=headers)
         return response.json()['result']['bankUrl']
     def book_ticket_alibaba(self,providerItemIds,username,password,firstName,lastName,title,nationalCode,notificationCellphoneNumber):
-        token=self.login_alibaba(username,password)
-        # print(token)
+        if not self.alibabaToken:
+            token=self.login_alibaba(username,password)
+            print(token)
+            try:
+                mongodb_password = os.getenv("MONGODB_PASSWORD")
+                uri = f"mongodb+srv://khabaziana:{mongodb_password}@cluster0.l4miazp.mongodb.net/?retryWrites=true&w=majority"
+                client = MongoClient(uri, server_api=ServerApi('1'))
+                #update token in mongo
+                db = client.Biliti
+                collection = db.Tasks
+                collection.update_one({'_id':self.Task_id},{'$set':{'alibabaToken':token}})
+                client.close()
+
+            except:
+                pass
+            self.token=token
+        else:
+            token=self.alibabaToken
+        print(token)
         seat=self.get_last_ticket_alibaba(providerItemIds)
         # print(seat)
         basketId= self.poass_passenger_ddetail_alibaba(providerItemIds,token,firstName,lastName,title,seat,nationalCode)
