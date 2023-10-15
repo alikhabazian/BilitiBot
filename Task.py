@@ -90,13 +90,14 @@ class Task:
                 message = f"I found ticket for you in {company}\ncurrent time is "+str(datetime.now().time())+'\n'+str(deleted_value)
                 message += '\n'+self.__str__()
                 if company=='alibaba':
-                    # try:
+                    try:
                         if self.username and self.password and self.firstName and self.lastName and self.title and self.nationalCode and self.notificationCellphoneNumber:
 
                             message += '\nit is url that I booked for you just pay it :'+self.book_ticket_alibaba(providerItemIds=available['proposalId'],username=self.username,password=self.password,firstName=self.firstName,lastName=self.lastName,title=self.title,nationalCode=self.nationalCode,notificationCellphoneNumber=self.notificationCellphoneNumber)
 
-                    # except Exception as e:
-                    #     print(e)
+                    except Exception as e:
+                        message += '\nthere is a problem in booking ticket for you'+str(e)
+
                 params = {
                     'chat_id': CHAT_ID,
                     'text': message
