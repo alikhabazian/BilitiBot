@@ -76,6 +76,7 @@ try:
             lastName=document['lastName'],
             nationalCode=document['nationalCode'],
             notificationCellphoneNumber=document['notificationCellphoneNumber'],
+            alibabaToken= document['alibabaToken'] if 'alibabaToken' in document else None,
             Task_id=document['_id']
         )
         # print(task)

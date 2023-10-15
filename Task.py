@@ -55,6 +55,7 @@ class Task:
         url = "https://ws.alibaba.ir/api/v1/bus/stations"
         querystring = {"filter":"containsall={ct:"+f"'{city}'"+"}"}
         response = requests.request("GET", url ,params=querystring)
+        print(response.json())
         result=response.json()['result']['items']
         if len(result)>0:
             return result[0]['domainCode']
@@ -69,9 +70,7 @@ class Task:
 
     def get_CityCode_snapp(self,city):
         url = "https://www.snapptrip.com/bus/api/listing/v1/cities"
-
         querystring = {"query":city}
-
         response = requests.request("GET", url, params=querystring)
         result=response.json()
         if len(result)>0:
