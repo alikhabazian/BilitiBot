@@ -77,7 +77,8 @@ try:
             nationalCode=document['nationalCode'],
             notificationCellphoneNumber=document['notificationCellphoneNumber'],
             alibabaToken= document['alibabaToken'] if 'alibabaToken' in document else None,
-            Task_id=document['_id']
+            Task_id=document['_id'],
+            active=document['active'] if 'active' in document else True,
         )
         # print(task)
         tasks.append(task)
