@@ -11,12 +11,11 @@ load_dotenv()
 BOT_TOKEN=bot_token = os.getenv("BOT_TOKEN")
 # 21310000 isf 11320000 teh
 class Task:
-    def __init__(self, creator, receivers, how_often,orgin_city,destination_city,date,start_time,end_time,username=None,password=None,firstName=None,lastName=None,title='MR',nationalCode=None,notificationCellphoneNumber=None,alibabaToken=None,Task_id=None,mute=True):
+    def __init__(self, creator, receivers, how_often,orgin_city,destination_city,date,start_time,end_time,username=None,password=None,firstName=None,lastName=None,title='MR',nationalCode=None,notificationCellphoneNumber=None,alibabaToken=None,Task_id=None,mute=True,active=True):
+        self.active = active
         self.creator = creator
         self.receivers = receivers
         self.how_often = how_often
-        # self.orginCityCode=orginCityCode
-        # self.destinationCityCode=destinationCityCode
         self.date = date
         self.start_time = start_time
         self.end_time = end_time
@@ -134,7 +133,10 @@ class Task:
     
     
     def get_data_ali_baba(self):
-        print(self.get_url_ali_baba())
+        if not self.active:
+            return
+
+        # print(self.get_url_ali_baba())
         request = requests.get(self.get_url_ali_baba())
         print(self.get_url_ali_baba())
         data=request.json()['result']
@@ -157,6 +159,8 @@ class Task:
             self.send_message(None,'alibaba')
     
     def get_data_snapp(self):
+        if not self.active:
+            return
         request = requests.get(self.get_url_snapp())
         data=request.json()
         availableList=data['solutions']
@@ -292,7 +296,22 @@ class Task:
         if self.confirm_alibaba(token,orderId):
 
             if self.status_alibaba(token,orderId):
-                return self.pay_alibaba(orderId,token)
+                result = self.pay_alibaba(orderId,token)
+                # must deactivate task
+                try:
+                    mongodb_password = os.getenv("MONGODB_PASSWORD")
+                    uri = f"mongodb+srv://khabaziana:{mongodb_password}@cluster0.l4miazp.mongodb.net/?retryWrites=true&w=majority"
+                    client = MongoClient(uri, server_api=ServerApi('1'))
+                    #update token in mongo
+                    db = client.Biliti
+                    collection = db.Tasks
+                    collection.update_one({'_id':self.Task_id},{'$set':{'active':False}})
+                    client.close()
+                except:
+                    pass
+
+
+                return result
 
 
 

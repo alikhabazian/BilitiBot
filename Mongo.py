@@ -78,7 +78,8 @@ try:
             nationalCode=document['nationalCode'] if 'nationalCode' in document else None,
             notificationCellphoneNumber=document['notificationCellphoneNumber'] if 'notificationCellphoneNumber' in document else None,
             alibabaToken= document['alibabaToken'] if 'alibabaToken' in document else None,
-            Task_id=document['_id']
+            Task_id=document['_id'],
+            active=document['active'] if 'active' in document else True,
         )
         print("here")
         print(task)
