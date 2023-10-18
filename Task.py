@@ -134,11 +134,11 @@ class Task:
     
     
     def get_data_ali_baba(self):
-        # print(self.get_url_ali_baba())
+        print(self.get_url_ali_baba())
         request = requests.get(self.get_url_ali_baba())
-        # print(self.get_url_ali_baba())
+        print(self.get_url_ali_baba())
         data=request.json()['result']
-        # print(data)
+        print(data)
         availableList=data['availableList']
         from_time_str = self.start_time
         from_time_obj = datetime.strptime(from_time_str, '%H:%M:%S').time()

@@ -61,6 +61,7 @@ try:
     # Print each item in the result set
     tasks = []
     for document in cursor:
+        print(document)
         task = Task(
             creator=document['creator'],
             receivers=document['receivers'],
@@ -70,20 +71,23 @@ try:
             date=document['date'],
             start_time=document['start_time'],
             end_time=document['end_time'],
-            username=document['username'],
-            password=document['password'],
-            firstName=document['firstName'],
-            lastName=document['lastName'],
-            nationalCode=document['nationalCode'],
-            notificationCellphoneNumber=document['notificationCellphoneNumber'],
+            username=document['username'] if 'username' in document else None,
+            password=document['password'] if 'password' in document else None,
+            firstName=document['firstName'] if 'firstName' in document else None,
+            lastName=document['lastName'] if 'lastName' in document else None,
+            nationalCode=document['nationalCode'] if 'nationalCode' in document else None,
+            notificationCellphoneNumber=document['notificationCellphoneNumber'] if 'notificationCellphoneNumber' in document else None,
             alibabaToken= document['alibabaToken'] if 'alibabaToken' in document else None,
             Task_id=document['_id']
         )
-        # print(task)
+        print("here")
+        print(task)
         tasks.append(task)
 
     for task in tasks:
-        # print(task)
+        print("here")
+        print(task)
+        print("here")
         try:
             task.get_data_ali_baba()
         except Exception as e:
