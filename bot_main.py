@@ -30,6 +30,7 @@ I will notify you when I find a ticket for you.
 It is free for now but It requires resources so I encourage you /donate to me for keep this bot alive.
 add your task with /add_task command.
 and if you are not familiar with this bot you can use /help command to connect to admin.
+If you want to cancel your task you can use /canceling_task command.
     ''')
 
 async def donate(update: Update, context: CallbackContext) -> int:
@@ -100,7 +101,7 @@ async def start_canceling(update: Update, context: CallbackContext) -> int:
                 Task id: {task.Task_id}
                 {task.__str__()}
             ''')
-        db.close()
+
     except Exception as e:
         print(e)
     if len(list_all_tasks)>0:
@@ -120,7 +121,6 @@ async def enter_canceling(update: Update, context: CallbackContext) -> int:
         db = client.Biliti
         collection = db.Tasks
         collection.delete_one({'_id': text})
-        db.close()
         await update.message.reply_text('''
     Task canceled.
         ''')
@@ -167,7 +167,6 @@ async def enter_field(update: Update, context: CallbackContext) -> int:
             collection.insert_one(document)
             await update.message.reply_text(
                 f"Inserting task finished")
-            db.close()
 
 
         except Exception as e:
@@ -289,12 +288,16 @@ if __name__ == "__main__":
             0: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, enter_canceling)
             ]
-        }
+
+        },
+        fallbacks=[CommandHandler("cancel", cancel)],
     )
 
     donate=CommandHandler("donate", donate)
 
     start_handler=CommandHandler("start", start)
+
+
 
 
     # Register the conversation handler
@@ -303,6 +306,7 @@ if __name__ == "__main__":
     application.add_handler(answering)
     application.add_handler(donate)
     application.add_handler(start_handler)
+    application.add_handler(canceling)
 
 
     # Start the bot
