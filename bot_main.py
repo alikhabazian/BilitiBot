@@ -58,7 +58,7 @@ async def enter_help(update: Update, context: CallbackContext) -> int:
     return ConversationHandler.END
 
 async def start_answer(update: Update, context: CallbackContext) -> int:
-    if update.effective_user.id=='684630739':
+    if update.effective_user.id==684630739:
         await update.message.reply_text("Please enter userid")
         return 0
     else:
@@ -307,6 +307,7 @@ if __name__ == "__main__":
     application.add_handler(donate)
     application.add_handler(start_handler)
     application.add_handler(canceling)
+
 
 
     # Start the bot
