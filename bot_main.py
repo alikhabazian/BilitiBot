@@ -68,6 +68,69 @@ async def enter_answer(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text("Please enter your answer")
     return ConversationHandler.END
 
+async def start_canceling(update: Update, context: CallbackContext) -> int:
+    list_all_tasks=[]
+    try:
+        db = client.Biliti
+        collection = db.Tasks
+        cursor = collection.find()
+        for document in cursor:
+            list_all_tasks.append(document)
+            # send each one to user
+            task=Task(
+                creator=document['creator'],
+                receivers=document['receivers'],
+                how_often=document['how_often'],
+                orgin_city=document['orgin_city'],
+                destination_city=document['destination_city'],
+                date=document['date'],
+                start_time=document['start_time'],
+                end_time=document['end_time'],
+                username=document['username'] if 'username' in document else None,
+                password=document['password'] if 'password' in document else None,
+                firstName=document['firstName'] if 'firstName' in document else None,
+                lastName=document['lastName'] if 'lastName' in document else None,
+                nationalCode=document['nationalCode'] if 'nationalCode' in document else None,
+                notificationCellphoneNumber=document['notificationCellphoneNumber'] if 'notificationCellphoneNumber' in document else None,
+                alibabaToken= document['alibabaToken'] if 'alibabaToken' in document else None,
+                Task_id=document['_id'],
+                active=document['active'] if 'active' in document else True,
+            )
+            await update.message.reply_text(f'''
+                Task id: {task.Task_id}
+                {task.__str__()}
+            ''')
+        db.close()
+    except Exception as e:
+        print(e)
+    if len(list_all_tasks)>0:
+        await update.message.reply_text('''
+    Please enter the task id you want to cancel.
+        ''')
+        return 0
+    else:
+        await update.message.reply_text('''
+    There is no task to cancel.
+        ''')
+        return ConversationHandler.END
+
+async def enter_canceling(update: Update, context: CallbackContext) -> int:
+    text=update.message.text
+    try:
+        db = client.Biliti
+        collection = db.Tasks
+        collection.delete_one({'_id': text})
+        db.close()
+        await update.message.reply_text('''
+    Task canceled.
+        ''')
+    except Exception as e:
+        print(e)
+        await update.message.reply_text('''
+    Task id is not valid.
+        ''')
+    return ConversationHandler.END
+
 # Define a function to start the conversation
 async def start_insert(update: Update, context: CallbackContext) -> int:
     context.user_data['index'] = 3
@@ -104,6 +167,9 @@ async def enter_field(update: Update, context: CallbackContext) -> int:
             collection.insert_one(document)
             await update.message.reply_text(
                 f"Inserting task finished")
+            db.close()
+
+
         except Exception as e:
             await update.message.reply_text("Your task has problem feel free to ask /help ")
 
@@ -215,6 +281,15 @@ if __name__ == "__main__":
 
         },
         fallbacks=[CommandHandler("cancel", cancel)],
+    )
+
+    canceling = ConversationHandler(
+        entry_points=[CommandHandler("canceling_task", start_canceling)],
+        states={
+            0: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, enter_canceling)
+            ]
+        }
     )
 
     donate=CommandHandler("donate", donate)
