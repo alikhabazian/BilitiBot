@@ -39,15 +39,28 @@ class Task:
     @staticmethod
     def get_task_fields():
         # This method returns a list of field names expected for a task.
+        #
+        # creator, receivers, how_often, orgin_city, destination_city, date, start_time, end_time, username = None, password = None, firstName = None, lastName = None, title = 'MR', nationalCode = None, notificationCellphoneNumber = None, alibabaToken = None, Task_id = None, mute = True, active = True):
         return [
-            "creator",
-            "receivers",
-            "how_often",
-            "orgin_city",
-            "destination_city",
-            "date",
-            "start_time",
-            "end_time"
+            {"field_name": "creator", "message": "creator id", "required": True},
+            {"field_name": "receivers", "message": "receivers id in array", "required": True},
+            {"field_name": "how_often", "message": "how_often", "required": True},
+            {"field_name": "orgin_city", "message": "origin city name that you want to start your trip from in persian", "required": True},
+            {"field_name": "destination_city", "message": "destination city name that you want to go in persian", "required": True},
+            {"field_name": "date", "message": "date that you want to go and it must be in this format: 2023-10-07 in gregorian calendar", "required": True},
+            {"field_name": "start_time", "message": "start time of that date that you want me search for you and it must be in this format: 00:00:00", "required": True},
+            {"field_name": "end_time", "message": "end time of that date that you want me search for you and it must be in this format: 23:59:59", "required": True},
+            {"field_name": "username", "message": "username of your alibaba account", "required": False},
+            {"field_name": "password", "message": "password of your alibaba account", "required": False},
+            {"field_name": "firstName", "message": "your firstName that you want booked under that name in your alibaba account", "required": False},
+            {"field_name": "lastName", "message": "your lastName that you want booked under that name in your alibaba account", "required": False},
+            {"field_name": "title", "message": "your gender that you want booked under that name in your alibaba account for men is 'MR'", "required": False},
+            {"field_name": "nationalCode", "message": "your nationalCode that you want booked under that name in your alibaba account", "required": False},
+            {"field_name": "notificationCellphoneNumber", "message": "your phonenumber that you want booked under that name in your alibaba account", "required": False},
+            {"field_name": "alibabaToken", "message": "it is local", "required": False},
+            {"field_name": "Task_id", "message": "it is local", "required": False},
+            {"field_name": "mute", "required": False},
+            {"field_name": "active", "required": False}
         ]
 
     def get_CityCode_ali_baba(self,city):
