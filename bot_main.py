@@ -104,7 +104,10 @@ async def start_canceling(update: Update, context: CallbackContext) -> int:
             ''')
 
     except Exception as e:
-        print(e)
+        await update.message.reply_text(f'''
+            Please enter the task id you want to cancel.
+            {e}
+                ''')
     if len(list_all_tasks)>0:
         await update.message.reply_text('''
     Please enter the task id you want to cancel.
