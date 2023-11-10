@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from Task import Task
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+from bson.objectid import ObjectId
 
 load_dotenv()
 
@@ -126,7 +127,7 @@ async def enter_canceling(update: Update, context: CallbackContext) -> int:
     try:
         db = client.Biliti
         collection = db.Tasks
-        collection.delete_one({'_id': text})
+        collection.delete_one({'_id': ObjectId(text)})
         await update.message.reply_text('''
     Task canceled.
         ''')
