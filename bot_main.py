@@ -74,7 +74,7 @@ async def start_canceling(update: Update, context: CallbackContext) -> int:
     try:
         db = client.Biliti
         collection = db.Tasks
-        cursor = collection.find()
+        cursor = collection.find({'creator': str(update.effective_user.id)})
         for document in cursor:
             list_all_tasks.append(document)
             # send each one to user
