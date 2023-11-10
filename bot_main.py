@@ -67,7 +67,17 @@ async def start_answer(update: Update, context: CallbackContext) -> int:
         return ConversationHandler.END
 
 async def enter_answer(update: Update, context: CallbackContext) -> int:
-    await update.message.reply_text("Please enter your answer")
+    try:
+        context.user_data['userid'] = int(update.message.text)
+        await update.message.reply_text("Please enter your answer")
+        return 1
+    except:
+        await update.message.reply_text("Please enter a valid userid")
+        return 0
+
+async def send_answer(update: Update, context: CallbackContext) -> int:
+    await context.bot.send_message(context.user_data['userid'], text=update.message.text)
+    await update.message.reply_text("Your message has been sent to the user.")
     return ConversationHandler.END
 
 async def start_canceling(update: Update, context: CallbackContext) -> int:
@@ -284,6 +294,9 @@ if __name__ == "__main__":
             0: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, enter_answer)
             ],
+            1:[
+                MessageHandler(filters.TEXT & ~filters.COMMAND, send_answer)
+            ]
 
         },
         fallbacks=[CommandHandler("cancel", cancel)],
