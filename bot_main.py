@@ -70,7 +70,8 @@ async def enter_answer(update: Update, context: CallbackContext) -> int:
     return ConversationHandler.END
 
 async def start_canceling(update: Update, context: CallbackContext) -> int:
-    list_all_tasks=[]
+    print('start_canceling')
+    list_all_tasks = []
     try:
         db = client.Biliti
         collection = db.Tasks
