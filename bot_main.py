@@ -106,6 +106,7 @@ async def start_canceling(update: Update, context: CallbackContext) -> int:
     except Exception as e:
         await update.message.reply_text(f'''
             Please enter the task id you want to cancel.
+            error is :
             {e}
                 ''')
     if len(list_all_tasks)>0:
@@ -121,6 +122,7 @@ async def start_canceling(update: Update, context: CallbackContext) -> int:
 
 async def enter_canceling(update: Update, context: CallbackContext) -> int:
     text=update.message.text
+    print(text)
     try:
         db = client.Biliti
         collection = db.Tasks
