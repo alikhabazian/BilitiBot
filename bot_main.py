@@ -76,9 +76,13 @@ async def enter_answer(update: Update, context: CallbackContext) -> int:
         return 0
 
 async def send_answer(update: Update, context: CallbackContext) -> int:
-    await context.bot.send_message(context.user_data['userid'], text=update.message.text)
-    await update.message.reply_text("Your message has been sent to the user.")
-    return ConversationHandler.END
+    try:
+        await context.bot.send_message(context.user_data['userid'], text=update.message.text)
+        await update.message.reply_text("Your message has been sent to the user.")
+        return ConversationHandler.END
+    except:
+        await update.message.reply_text("I can not send message to user.")
+        return ConversationHandler.END
 
 async def start_canceling(update: Update, context: CallbackContext) -> int:
     print('start_canceling')
