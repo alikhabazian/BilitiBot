@@ -1,1 +1,4 @@
 myenv/
+.env
+.idea/
+.DS_Store
