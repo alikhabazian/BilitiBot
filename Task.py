@@ -64,10 +64,14 @@ class Task:
         ]
 
     def get_CityCode_ali_baba(self,city):
-        url = "https://ws.alibaba.ir/api/v1/bus/stations"
-        querystring = {"filter":"containsall={ct:"+f"'{city}'"+"}"}
-        response = requests.request("GET", url ,params=querystring)
-        print(response.json())
+        
+        url = f"https://ws.alibaba.ir/api/v1/bus/stations?filter=containsall={{ct:'{city}'}}"
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+
+        # print(url)
+        # querystring = {"filter":"containsall={ct:"+f"'{city}'"+"}"}
+        response = requests.request("GET", url,headers=headers )
+        # print(response)
         result=response.json()['result']['items']
         if len(result)>0:
             return result[0]['domainCode']
@@ -150,7 +154,9 @@ class Task:
             return
 
         # print(self.get_url_ali_baba())
-        request = requests.get(self.get_url_ali_baba())
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+
+        request = requests.get(self.get_url_ali_baba(),headers=headers)
         print(self.get_url_ali_baba())
         data=request.json()['result']
         print(data)
